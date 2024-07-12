@@ -4,7 +4,7 @@ import { Excalidraw } from "@excalidraw/excalidraw";
 import "./index.scss";
 import { convertToExcalidrawElements } from "@excalidraw/excalidraw";
 import useStore from "@/store";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 
 const ExcalidrawWrapper: React.FC = () => {
@@ -35,38 +35,7 @@ const ExcalidrawWrapper: React.FC = () => {
 
   const [isMounted, setIsMounted] = useState(false); // Add state to track mount status
 
-  useEffect(() => {
-    setIsMounted(true); // Set mounted state when component mounts
-
-    const ws = new WebSocket("ws://localhost:8765/");
-
-    ws.onopen = () => {
-      console.log("WebSocket connected");
-      // You can also send messages to the server here
-      ws.send("Hello Server!");
-    };
-
-    ws.onmessage = (event) => {
-      console.log("Message from server ", event.data);
-      handleClick();
-    };
-
-    ws.onerror = (error) => {
-      console.error("WebSocket error: ", error);
-    };
-
-    ws.onclose = () => {
-      console.log("WebSocket disconnected");
-    };
-
-    return () => {
-      ws.close();
-    };
-  }, []);
-
-  console.log(initialElements);
-
-  function handleClick() {
+  const handleClick = useCallback(() => {
     const sceneData = {
       elements: [
         {
@@ -100,24 +69,55 @@ const ExcalidrawWrapper: React.FC = () => {
         },
       ],
     };
+    console.log(excalidrawAPI);
     if (excalidrawAPI) {
+      console.log("clicked");
       excalidrawAPI.updateScene(sceneData);
     }
-  }
+  }, [excalidrawAPI]);
+
+  useEffect(() => {
+    setIsMounted(true); // Set mounted state when component mounts
+
+    const ws = new WebSocket("ws://localhost:8765/");
+
+    ws.onopen = () => {
+      console.log("WebSocket connected");
+      // You can also send messages to the server here
+      ws.send("Hello Server!");
+    };
+
+    ws.onmessage = (event) => {
+      console.log("Message from server ", event.data);
+      handleClick();
+    };
+
+    ws.onerror = (error) => {
+      console.error("WebSocket error: ", error);
+    };
+
+    ws.onclose = () => {
+      console.log("WebSocket disconnected");
+    };
+
+    return () => {
+      ws.close();
+    };
+  }, [excalidrawAPI, handleClick]);
 
   return (
     <>
       {isMounted && ( // Render Excalidraw only if isMounted is true
         <Excalidraw
           initialData={{
-            // elements: showElements,
+            elements: initialElements,
             appState: { zenModeEnabled: true, theme: "dark" },
             scrollToContent: true,
           }}
           excalidrawAPI={(api) => setExcalidrawAPI(api)}
         />
       )}
-      <Button onClick={handleClick}>Click me</Button>
+      {/* <Button onClick={handleClick}>Click me</Button> */}
     </>
   );
 };
