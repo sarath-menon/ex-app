@@ -1,3 +1,4 @@
+import useStore from "@/store";
 import dynamic from "next/dynamic";
 
 const ExcalidrawWrapper = dynamic(
