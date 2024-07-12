@@ -37,6 +37,31 @@ const ExcalidrawWrapper: React.FC = () => {
 
   useEffect(() => {
     setIsMounted(true); // Set mounted state when component mounts
+
+    const ws = new WebSocket("ws://localhost:8765/");
+
+    ws.onopen = () => {
+      console.log("WebSocket connected");
+      // You can also send messages to the server here
+      ws.send("Hello Server!");
+    };
+
+    ws.onmessage = (event) => {
+      console.log("Message from server ", event.data);
+      handleClick();
+    };
+
+    ws.onerror = (error) => {
+      console.error("WebSocket error: ", error);
+    };
+
+    ws.onclose = () => {
+      console.log("WebSocket disconnected");
+    };
+
+    return () => {
+      ws.close();
+    };
   }, []);
 
   console.log(initialElements);
