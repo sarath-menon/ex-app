@@ -72,87 +72,15 @@ const ExcalidrawWrapper: React.FC = () => {
 
   const handleClick = useCallback(
     (elements) => {
-      const sceneData1 = {
-        elements: [
-          {
-            type: "rectangle",
-            version: 141,
-            versionNonce: 361174001,
-            isDeleted: false,
-            id: "oDVXy8D6rom3H1-LLH2-f",
-            fillStyle: "hachure",
-            strokeWidth: 3,
-            strokeStyle: "solid",
-            roughness: 1,
-            opacity: 100,
-            angle: 0,
-            x: 100.50390625,
-            y: 93.67578125,
-            strokeColor: "#c92a2a",
-            backgroundColor: "transparent",
-            width: 186.47265625,
-            height: 141.9765625,
-            seed: 1968410350,
-            groupIds: [],
-            boundElements: null,
-            locked: false,
-            link: null,
-            updated: 1,
-            roundness: {
-              type: 3,
-              value: 32,
-            },
-          },
-          {
-            id: "ZKZ1oNGNnaVn5Zu-KUETQ",
-            type: "text",
-            x: 429.58984375,
-            y: 76.8671875,
-            width: 39.91996765136719,
-            height: 25,
-            angle: 0,
-            strokeColor: "#1e1e1e",
-            backgroundColor: "transparent",
-            fillStyle: "solid",
-            strokeWidth: 2,
-            strokeStyle: "solid",
-            roughness: 1,
-            opacity: 100,
-            groupIds: [],
-            frameId: null,
-            roundness: null,
-            seed: 487817551,
-            version: 5,
-            versionNonce: 105260705,
-            isDeleted: false,
-            boundElements: null,
-            updated: 1720798373319,
-            link: null,
-            locked: false,
-            text: "salv",
-            fontSize: 20,
-            fontFamily: 1,
-            textAlign: "left",
-            verticalAlign: "top",
-            baseline: 18,
-            containerId: null,
-            originalText: "salv",
-            lineHeight: 1.25,
-          },
-        ],
-      };
-
-      console.log(sceneData1);
-
       const sceneData = {
         type: "excalidraw",
         elements: elements,
       };
 
-      console.log(sceneData1);
+      console.log(sceneData);
 
       if (excalidrawAPI) {
-        excalidrawAPI.updateScene(sceneData1);
+        excalidrawAPI.updateScene(sceneData);
       }
       console.log(excalidrawAPI.getSceneElements());
     },
