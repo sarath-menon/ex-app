@@ -44,6 +44,8 @@ const newElements = [
 
 const ExcalidrawWrapper: React.FC = () => {
   const [excalidrawAPI, setExcalidrawAPI] = useState(null);
+  const [connectionId, setConnectionId] = useState(null);
+
   const initialElements = convertToExcalidrawElements([
     {
       type: "rectangle",
@@ -94,14 +96,19 @@ const ExcalidrawWrapper: React.FC = () => {
 
     ws.onopen = () => {
       console.log("WebSocket connected");
-      // You can also send messages to the server here
-      ws.send("Hello Server!");
     };
 
     ws.onmessage = (event) => {
       // console.log("Message from server ", event.data);
       let jsonData = JSON.parse(event.data);
-      handleClick(jsonData);
+
+      if (jsonData.type === "connection_id") {
+        const connectionId = jsonData.id;
+        console.log("Connection ID:", connectionId);
+        setConnectionId(connectionId);
+      } else {
+        handleClick(jsonData);
+      }
     };
 
     ws.onerror = (error) => {
