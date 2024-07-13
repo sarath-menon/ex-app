@@ -1,6 +1,12 @@
 "use client";
 import * as excalidrawLib from "@excalidraw/excalidraw";
 import { Excalidraw } from "@excalidraw/excalidraw";
+import {
+  ExcalidrawImperativeAPI,
+  ExcalidrawProps,
+  ActiveTool,
+  PointerDownState,
+} from "@excalidraw/excalidraw/types/types";
 import "./index.scss";
 import { convertToExcalidrawElements } from "@excalidraw/excalidraw";
 import useStore from "@/store";
@@ -43,8 +49,10 @@ const newElements = [
 ];
 
 const ExcalidrawWrapper: React.FC = () => {
-  const [excalidrawAPI, setExcalidrawAPI] = useState(null);
+  const [excalidrawAPI, setExcalidrawAPI] =
+    useState<ExcalidrawImperativeAPI | null>(null);
   const [connectionId, setConnectionId] = useState(null);
+  const [ws, setWs] = useState<WebSocket | null>(null);
 
   const initialElements = convertToExcalidrawElements([
     {
@@ -89,10 +97,32 @@ const ExcalidrawWrapper: React.FC = () => {
     [excalidrawAPI]
   );
 
+  function onPointerDown(
+    activeTool: ActiveTool,
+    pointerDownState: PointerDownState
+  ) {
+    // console.log("Pointer down state", pointerDownState);
+    // console.log("Hit element", pointerDownState.hit);
+    // console.log("Active tool", activeTool);
+
+    // send to server
+    ws?.send(
+      JSON.stringify({
+        type: "pointer_down",
+        data: { activeTool, pointerDownState },
+      })
+    );
+  }
+
+  function onChange(event: ExcalidrawProps["onChange"]) {
+    console.log("Change", event);
+  }
+
   useEffect(() => {
     setIsMounted(true); // Set mounted state when component mounts
 
     const ws = new WebSocket("ws://localhost:8765/");
+    setWs(ws);
 
     ws.onopen = () => {
       console.log("WebSocket connected");
@@ -134,6 +164,8 @@ const ExcalidrawWrapper: React.FC = () => {
             scrollToContent: true,
           }}
           excalidrawAPI={(api) => setExcalidrawAPI(api)}
+          onPointerDown={onPointerDown}
+          // onChange={onChange}
         />
       )}
       <Button onClick={() => console.log(excalidrawAPI?.getSceneElements())}>
