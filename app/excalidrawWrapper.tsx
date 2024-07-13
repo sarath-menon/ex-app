@@ -6,6 +6,7 @@ import {
   ExcalidrawProps,
   ActiveTool,
   PointerDownState,
+  AppState,
 } from "@excalidraw/excalidraw/types/types";
 import "./index.scss";
 import { convertToExcalidrawElements } from "@excalidraw/excalidraw";
@@ -114,8 +115,10 @@ const ExcalidrawWrapper: React.FC = () => {
     );
   }
 
-  function onChange(event: ExcalidrawProps["onChange"]) {
-    console.log("Change", event);
+  function onChange(elements: any[], AppState: AppState, files: any[]) {
+    console.log("Active tool", AppState.activeTool);
+    console.log("Current btn", AppState.cursorButton);
+    console.log("Active embeddable", AppState.activeEmbeddable);
   }
 
   useEffect(() => {
@@ -165,23 +168,30 @@ const ExcalidrawWrapper: React.FC = () => {
   }, [excalidrawAPI, handleClick]);
 
   return (
-    <>
-      {isMounted && ( // Render Excalidraw only if isMounted is true
-        <Excalidraw
-          initialData={{
-            elements: initialElements,
-            appState: { zenModeEnabled: false, theme: "dark" },
-            scrollToContent: true,
-          }}
-          excalidrawAPI={(api) => setExcalidrawAPI(api)}
-          onPointerDown={onPointerDown}
-          // onChange={onChange}
-        />
-      )}
-      <Button onClick={() => console.log(excalidrawAPI?.getSceneElements())}>
-        Click me
-      </Button>
-    </>
+    <div className="flex flex-col w-full">
+      <div className="w-full h-[95vh] items-start">
+        {isMounted && ( // Render Excalidraw only if isMounted is true
+          <Excalidraw
+            initialData={{
+              elements: initialElements,
+              appState: { zenModeEnabled: false, theme: "dark" },
+              scrollToContent: true,
+            }}
+            excalidrawAPI={(api) => setExcalidrawAPI(api)}
+            onPointerDown={onPointerDown}
+            // onChange={onChange}
+          />
+        )}
+      </div>
+      <div className="flex">
+        <Button onClick={() => console.log(excalidrawAPI?.getSceneElements())}>
+          Scene elements
+        </Button>
+        <Button onClick={() => console.log(excalidrawAPI?.getAppState())}>
+          App state
+        </Button>
+      </div>
+    </div>
   );
 };
 
