@@ -123,31 +123,41 @@ const ExcalidrawWrapper: React.FC = () => {
 
     const ws = new WebSocket("ws://localhost:8765/");
     setWs(ws);
+    function setupWebSocket() {
+      ws.onopen = () => {
+        console.log("WebSocket connected");
+      };
 
-    ws.onopen = () => {
-      console.log("WebSocket connected");
-    };
+      ws.onmessage = (event) => {
+        // console.log("Message from server ", event.data);
+        let jsonData = JSON.parse(event.data);
 
-    ws.onmessage = (event) => {
-      // console.log("Message from server ", event.data);
-      let jsonData = JSON.parse(event.data);
+        if (jsonData.type === "connection_id") {
+          const connectionId = jsonData.id;
+          console.log("Connection ID:", connectionId);
+          setConnectionId(connectionId);
+        } else {
+          handleClick(jsonData);
+        }
+      };
 
-      if (jsonData.type === "connection_id") {
-        const connectionId = jsonData.id;
-        console.log("Connection ID:", connectionId);
-        setConnectionId(connectionId);
-      } else {
-        handleClick(jsonData);
-      }
-    };
+      ws.onerror = (error) => {
+        console.error("WebSocket error: ", error);
+      };
 
-    ws.onerror = (error) => {
-      console.error("WebSocket error: ", error);
-    };
+      ws.onclose = () => {
+        console.log("WebSocket disconnected");
+        // Attempt to reconnect after a delay
+        setTimeout(() => {
+          if (ws.readyState === WebSocket.OPEN) {
+            console.log("Attempting to reconnect WebSocket...");
+            setupWebSocket(); // Recursively set up new WebSocket connection
+          }
+        }, 3000); // Reconnect after 3 seconds
+      };
+    }
 
-    ws.onclose = () => {
-      console.log("WebSocket disconnected");
-    };
+    setupWebSocket();
 
     return () => {
       ws.close();
